@@ -1,120 +1,84 @@
-
-
---
--- Table structure for table `orderdetails`
---
-
-DROP TABLE IF EXISTS `orderdetails`;
-CREATE TABLE `orderdetails` (
-  `DetailID` int NOT NULL AUTO_INCREMENT,
-  `DetailOrderID` int NOT NULL,
-  `DetailProductID` int NOT NULL,
-  `DetailName` varchar(250) NOT NULL,
-  `DetailPrice` int NOT NULL,
-  `DetailQuantity` int NOT NULL,
-  PRIMARY KEY (`DetailID`)
+CREATE SCHEMA obasstore;
+CREATE TABLE users (
+customer_id INT(11) PRIMARY KEY AUTO_INCREMENT,
+userFirstName VARCHAR (50) NOT NULL,
+userLastName VARCHAR (50) NOT NULL,
+userdob DATE NOT NULL,
+userPhoneNumber VARCHAR (20) NOT NULL,
+userAddress VARCHAR (255),
+userEmail VARCHAR (255) NOT NULL UNIQUE,
+userCity VARCHAR (255) NOT NULL,
+userState VARCHAR (255) NOT NULL,
+userCountry VARCHAR (255) NOT NULL,
+userRegistrationDate DATE,
+userPassword VARCHAR (255)
 );
 
---
--- Dumping data for table `orderdetails`
---
-
-LOCK TABLES `orderdetails` WRITE;
-/*!40000 ALTER TABLE `orderdetails` DISABLE KEYS */;
-/*!40000 ALTER TABLE `orderdetails` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `orders`
---
-
-DROP TABLE IF EXISTS `orders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `orders` (
-  `OrderID` int NOT NULL AUTO_INCREMENT,
-  `OrderUserID` int NOT NULL,
-  `OrderAmount` float NOT NULL,
-  `OrderShipName` varchar(100) NOT NULL,
-  `OrderShipAddress` varchar(100) NOT NULL,
-  `OrderShipAddress2` varchar(100) NOT NULL,
-  `OrderCity` varchar(50) NOT NULL,
-  `OrderState` varchar(50) NOT NULL,
-  `OrderZip` varchar(20) NOT NULL,
-  `OrderCountry` varchar(50) NOT NULL,
-  `OrderPhone` varchar(20) NOT NULL,
-  `OrderShipping` float NOT NULL,
-  `OrderEmail` varchar(100) NOT NULL,
-  `OrderDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `OrderTrackingNumber` varchar(80) DEFAULT NULL,
-  PRIMARY KEY (`OrderID`)
+CREATE TABLE products (
+productId INT(11) PRIMARY KEY AUTO_INCREMENT,
+productName VARCHAR (255) NOT NULL,
+productDescription VARCHAR (255) NOT NULL,
+productPrice DECIMAL (15,2) NOT NULL,
+productDiscountPrice DECIMAL (15,2),
+productQuantity INT(11),
+productViews INT(11),
+productLikes INT(11),
+productStatus VARCHAR (50),
+productRating INT(5),
+productThumb VARCHAR (255) NOT NULL,
+productImage1 VARCHAR (255),
+productImage3 VARCHAR (255),
+productImage4 VARCHAR (255)
 );
 
---
--- Dumping data for table `orders`
---
+CREATE TABLE categories (
+categoryId INT(11) PRIMARY KEY AUTO_INCREMENT,
+categoryName VARCHAR (255),
+categoryProductId INT(11),
+FOREIGN KEY (categoryProductId) REFERENCES products(productId)
+);
 
-LOCK TABLES `orders` WRITE;
-/*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-/*!40000 ALTER TABLE `orders` ENABLE KEYS */;
-UNLOCK TABLES;
+CREATE TABLE reviews (
+reviewId INT(11) PRIMARY KEY AUTO_INCREMENT,
+reviewRating INT(5) NOT NULL,
+reviewMessage VARCHAR (255) NOT NULL,
+reviewProductId INT(11) NOT NULL,
+FOREIGN KEY (reviewProductId) REFERENCES products(productId)
+);
 
---
--- Table structure for table `products`
---
+CREATE TABLE orders (
+orderId INT(11) PRIMARY KEY AUTO_INCREMENT,
+orderDate DATE,
+orderQuantity INT(11),
+orderProductId INT(11),
+orderCustomerId INT(11),
+FOREIGN KEY (orderProductID) REFERENCES products(productId),
+FOREIGN KEY (orderCustomerID) REFERENCES customers(customerId)
+);
 
-DROP TABLE IF EXISTS `products`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `products` (
-  `ProductID` int NOT NULL AUTO_INCREMENT,
-  `ProductName` varchar(100) NOT NULL,
-  `ProductPrice` float NOT NULL,
-  `ProductDesc` varchar(1000) NOT NULL,
-  `ProductImage` varchar(100) NOT NULL,
-  `ProductCategoryID` int DEFAULT NULL,
-  `ProductLocation` varchar(250) DEFAULT NULL,
-  PRIMARY KEY (`ProductID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE payments (
+paymentID INT(11) PRIMARY KEY AUTO_INCREMENT,
+paymentDate DATE,
+paymentCardHolderName VARCHAR (50),
+paymentCardType VARCHAR (50),
+paymentStatus VARCHAR (50) NOT NULL,
+paymentAmountPaid DECIMAL (15,2),
+paymentOrderId INT(11),
+FOREIGN KEY (paymentOrderID) REFERENCES orders(orderId)
+);
 
---
--- Dumping data for table `products`
---
-
-LOCK TABLES `products` WRITE;
-/*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Pam slippers',5000,'fancy leather pam','',1,NULL),(2,'casual shoe',10000,'fancy casual shoe','',2,NULL);
-/*!40000 ALTER TABLE `products` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `users`
---
-
-DROP TABLE IF EXISTS `users`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `users` (
-  `userID` int NOT NULL AUTO_INCREMENT,
-  `userFirstName` varchar(45) DEFAULT NULL,
-  `userLastName` varchar(45) DEFAULT NULL,
-  `userEmail` varchar(45) DEFAULT NULL,
-  `userCity` varchar(45) DEFAULT NULL,
-  `userState` varchar(45) DEFAULT NULL,
-  `userPhone` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'Mike','Howard','mikhow@gmail.com','Abuja','FCT','080898793'),(2,'Esther','Mary','maryes@gmail.com','Lokoja','Kogi','080823923');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
--- Dump completed on 2020-04-06 10:45:42
+CREATE TABLE shipping (
+shippingId INT(11) PRIMARY KEY AUTO_INCREMENT,
+shippingDate DATE,
+shippingFee DECIMAL (15,2),
+shippingAddress VARCHAR (255),
+shippingState VARCHAR (255),
+shippingCity VARCHAR (255),
+shippingStatus VARCHAR (45),
+shippingOrderId INT(11),
+shippingPaymentId INT(11),
+shippingCustomerId INT(11),
+FOREIGN KEY (shippingCustomerId) REFERENCES customers(customerId),
+FOREIGN KEY (shippingPaymentId) REFERENCES payments(paymentId),
+FOREIGN KEY (shippingOrderId) REFERENCES orders(orderId)
+);
